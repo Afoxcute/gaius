@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { useWallet } from '@txnlab/use-wallet-react';
-import { motion } from 'framer-motion';
-import { Check, AlertTriangle, ArrowRight, Clock, Star } from 'lucide-react';
+import { Check, AlertTriangle, ArrowRight, Clock } from 'lucide-react';
 import { processSubscription, SUBSCRIPTION_PLANS, SubscriptionDetails, formatExpiryDate, getDaysRemaining } from '../utils/subscription';
-import { AnimatedCard, AnimatedButton } from './AnimatedCard';
 
 interface PricingPlansProps {
   onSubscriptionComplete?: (plan: string) => void;
@@ -82,49 +80,26 @@ export function PricingPlans({ onSubscriptionComplete, currentSubscription }: Pr
 
   return (
     <div className="py-8">
-      <motion.div 
-        className="text-center mb-12"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <motion.h2 
-          className="text-3xl font-bold mb-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          Choose Your Subscription Plan
-        </motion.h2>
-        <motion.p 
-          className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
+      <div className="text-center mb-12">
+        <h2 className="text-3xl font-bold mb-4">Choose Your Subscription Plan</h2>
+        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
           Select the plan that best fits your organization's needs
-        </motion.p>
+        </p>
         
         {currentSubscription && currentSubscription.isActive && (
-          <motion.div 
-            className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg inline-flex items-center gap-3 text-blue-800 dark:text-blue-300"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
+          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg inline-flex items-center gap-3 text-blue-800 dark:text-blue-300">
             <Clock size={20} />
             <span>
               Your <strong>{SUBSCRIPTION_PLANS[currentSubscription.plan as keyof typeof SUBSCRIPTION_PLANS]?.name}</strong> subscription is active until {formatExpiryDate(currentSubscription.expiryDate)} ({getDaysRemaining(currentSubscription.expiryDate)} days remaining)
             </span>
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        {plansArray.map((plan, index) => (
-          <AnimatedCard
+        {plansArray.map((plan) => (
+          <div 
             key={plan.id}
-            delay={index * 0.1}
             className={`bg-white dark:bg-gray-800 rounded-2xl overflow-hidden transition-all duration-300 ${
               selectedPlan === plan.id 
                 ? 'ring-4 ring-blue-500 transform scale-105' 
@@ -132,134 +107,71 @@ export function PricingPlans({ onSubscriptionComplete, currentSubscription }: Pr
             } ${plan.recommended ? 'relative' : ''}`}
           >
             {plan.recommended && (
-              <motion.div 
-                className="absolute top-0 left-0 right-0 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-center py-2 text-sm font-medium flex items-center justify-center gap-1"
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 + index * 0.1 }}
-              >
-                <Star size={16} />
+              <div className="absolute top-0 left-0 right-0 bg-blue-500 text-white text-center py-1 text-sm font-medium">
                 Recommended
-              </motion.div>
+              </div>
             )}
             
             {isCurrentPlan(plan.id) && (
-              <motion.div 
-                className="absolute top-0 left-0 right-0 bg-green-500 text-white text-center py-2 text-sm font-medium"
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 + index * 0.1 }}
-              >
+              <div className="absolute top-0 left-0 right-0 bg-green-500 text-white text-center py-1 text-sm font-medium">
                 Current Plan
-              </motion.div>
+              </div>
             )}
             
-            <div className={`p-6 ${(plan.recommended || isCurrentPlan(plan.id)) ? 'pt-12' : ''}`}>
-              <motion.h3 
-                className="text-2xl font-bold mb-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 + index * 0.1 }}
-              >
-                {plan.name}
-              </motion.h3>
-              <motion.div 
-                className="mb-6"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5 + index * 0.1, type: "spring", stiffness: 200 }}
-              >
+            <div className={`p-6 ${(plan.recommended || isCurrentPlan(plan.id)) ? 'pt-10' : ''}`}>
+              <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+              <div className="mb-6">
                 <span className="text-4xl font-bold">{plan.price}</span>
                 <span className="text-gray-600 dark:text-gray-400"> ALGO</span>
                 <span className="text-sm text-gray-500 dark:text-gray-400">/month</span>
-              </motion.div>
+              </div>
               
               <ul className="space-y-3 mb-8">
-                <motion.li 
-                  className="flex items-center gap-2"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 + index * 0.1 }}
-                >
+                <li className="flex items-center gap-2">
                   <Check size={18} className="text-green-500 flex-shrink-0" />
                   <span>{plan.memberLimit === Infinity ? 'Unlimited' : plan.memberLimit} members</span>
-                </motion.li>
-                <motion.li 
-                  className="flex items-center gap-2"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.7 + index * 0.1 }}
-                >
+                </li>
+                <li className="flex items-center gap-2">
                   <Check size={18} className="text-green-500 flex-shrink-0" />
                   <span>{plan.programLimit === Infinity ? 'Unlimited' : plan.programLimit} loyalty programs</span>
-                </motion.li>
-                {plan.features.map((feature, featureIndex) => (
-                  <motion.li 
-                    key={featureIndex} 
-                    className="flex items-center gap-2"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.8 + index * 0.1 + featureIndex * 0.05 }}
-                  >
+                </li>
+                {plan.features.map((feature, index) => (
+                  <li key={index} className="flex items-center gap-2">
                     <Check size={18} className="text-green-500 flex-shrink-0" />
                     <span>{feature}</span>
-                  </motion.li>
+                  </li>
                 ))}
               </ul>
               
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9 + index * 0.1 }}
+              <button
+                onClick={() => handleSelectPlan(plan.id)}
+                disabled={isCurrentPlan(plan.id)}
+                className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
+                  isCurrentPlan(plan.id)
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 cursor-not-allowed'
+                    : selectedPlan === plan.id
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-blue-50 dark:hover:bg-blue-900/30'
+                }`}
               >
-                <AnimatedButton
-                  onClick={() => handleSelectPlan(plan.id)}
-                  disabled={isCurrentPlan(plan.id)}
-                  variant={selectedPlan === plan.id ? 'primary' : 'outline'}
-                  className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-                    isCurrentPlan(plan.id)
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 cursor-not-allowed'
-                      : selectedPlan === plan.id
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-blue-50 dark:hover:bg-blue-900/30'
-                  }`}
-                >
-                  {isCurrentPlan(plan.id) 
-                    ? 'Current Plan' 
-                    : isUpgrade(plan.id) 
-                      ? 'Upgrade Plan' 
-                      : selectedPlan === plan.id 
-                        ? 'Selected' 
-                        : 'Select Plan'}
-                </AnimatedButton>
-              </motion.div>
+                {isCurrentPlan(plan.id) 
+                  ? 'Current Plan' 
+                  : isUpgrade(plan.id) 
+                    ? 'Upgrade Plan' 
+                    : selectedPlan === plan.id 
+                      ? 'Selected' 
+                      : 'Select Plan'}
+              </button>
             </div>
-          </AnimatedCard>
+          </div>
         ))}
       </div>
 
       {selectedPlan && (
-        <motion.div 
-          className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
-          initial={{ opacity: 0, y: 20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.5, type: "spring", stiffness: 200 }}
-        >
-          <motion.h3 
-            className="text-xl font-bold mb-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            Complete Your Subscription
-          </motion.h3>
+        <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+          <h3 className="text-xl font-bold mb-4">Complete Your Subscription</h3>
           
-          <motion.div 
-            className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-          >
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <p className="font-medium">
               You've selected the {SUBSCRIPTION_PLANS[selectedPlan as keyof typeof SUBSCRIPTION_PLANS]?.name} plan at {SUBSCRIPTION_PLANS[selectedPlan as keyof typeof SUBSCRIPTION_PLANS]?.price} ALGO per month.
             </p>
@@ -268,12 +180,7 @@ export function PricingPlans({ onSubscriptionComplete, currentSubscription }: Pr
             </p>
             
             {currentSubscription && currentSubscription.isActive && (
-              <motion.div 
-                className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4 }}
-              >
+              <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                 <div className="flex items-start gap-2">
                   <AlertTriangle size={20} className="text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                   <div>
@@ -287,28 +194,19 @@ export function PricingPlans({ onSubscriptionComplete, currentSubscription }: Pr
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
-          </motion.div>
+          </div>
           
-          <motion.div 
-            className="flex flex-col sm:flex-row gap-4 items-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <AnimatedButton
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <button
               onClick={handleSubscribe}
               disabled={isProcessing}
               className="w-full sm:w-auto px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isProcessing ? (
                 <>
-                  <motion.div 
-                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  />
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
                   Processing...
                 </>
               ) : isUpgrade(selectedPlan) ? (
@@ -324,39 +222,33 @@ export function PricingPlans({ onSubscriptionComplete, currentSubscription }: Pr
               ) : (
                 'Complete Subscription'
               )}
-            </AnimatedButton>
+            </button>
             
-            <AnimatedButton
+            <button
               onClick={() => setSelectedPlan(null)}
               disabled={isProcessing}
-              variant="outline"
               className="w-full sm:w-auto px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
-            </AnimatedButton>
-          </motion.div>
+            </button>
+          </div>
           
           {paymentResult && (
-            <motion.div 
-              className={`mt-6 p-4 rounded-lg ${
-                paymentResult.success 
-                  ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200' 
-                  : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'
-              }`}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
+            <div className={`mt-6 p-4 rounded-lg ${
+              paymentResult.success 
+                ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200' 
+                : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'
+            }`}>
               <p className="font-medium">{paymentResult.message}</p>
               {paymentResult.success && paymentResult.txId && (
                 <p className="mt-2 text-sm">
                   Transaction ID: <span className="font-mono">{paymentResult.txId.substring(0, 8)}...{paymentResult.txId.substring(paymentResult.txId.length - 8)}</span>
                 </p>
               )}
-            </motion.div>
+            </div>
           )}
-        </motion.div>
+        </div>
       )}
     </div>
   );
-}
+} 
