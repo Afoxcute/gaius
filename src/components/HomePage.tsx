@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useWallet } from '@txnlab/use-wallet-react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { AnimatedCard, AnimatedButton, AnimatedList, AnimatedCounter, AnimatedProgress } from './AnimatedCard';
 
 interface HomePageProps {
   onNavigate: (page: 'home' | 'loyalty-dashboard' | 'create-program' | 'send-pass' | 'pricing') => void;
@@ -9,6 +10,9 @@ interface HomePageProps {
 export function HomePage({ onNavigate }: HomePageProps) {
   const { activeAddress } = useWallet();
   const [isLoaded, setIsLoaded] = useState(false);
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 300], [0, -50]);
+  const y2 = useTransform(scrollY, [0, 300], [0, -100]);
 
   useEffect(() => {
     // Simulate loading delay for animation purposes
@@ -48,7 +52,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
     },
     hover: {
       scale: 1.05,
-      boxShadow: '0 10px 20px rgba(0, 0, 0, 0.2)',
+      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
       transition: { type: 'spring', stiffness: 400, damping: 10 }
     }
   };
@@ -87,9 +91,47 @@ export function HomePage({ onNavigate }: HomePageProps) {
       <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 to-purple-700 text-white">
         {/* Background animated shapes */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-blue-500 opacity-20 animate-blob"></div>
-          <div className="absolute top-40 -left-20 w-60 h-60 rounded-full bg-purple-500 opacity-20 animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-40 right-20 w-40 h-40 rounded-full bg-pink-500 opacity-20 animate-blob animation-delay-4000"></div>
+          <motion.div 
+            style={{ y: y1 }}
+            className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-blue-500 opacity-20"
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 180, 360],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
+          <motion.div 
+            style={{ y: y2 }}
+            className="absolute top-40 -left-20 w-60 h-60 rounded-full bg-purple-500 opacity-20"
+            animate={{
+              scale: [1, 0.8, 1],
+              rotate: [0, -180, -360],
+            }}
+            transition={{
+              duration: 15,
+              repeat: Infinity,
+              ease: "linear",
+              delay: 2
+            }}
+          />
+          <motion.div 
+            className="absolute bottom-40 right-20 w-40 h-40 rounded-full bg-pink-500 opacity-20"
+            animate={{
+              scale: [1, 1.3, 1],
+              x: [0, 50, 0],
+              y: [0, -30, 0],
+            }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 4
+            }}
+          />
         </div>
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10">
@@ -103,15 +145,30 @@ export function HomePage({ onNavigate }: HomePageProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
             >
-              <span className="block">Welcome to</span>
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+              <motion.span 
+                className="block"
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+              >
+                Welcome to
+              </motion.span>
+              <motion.span 
+                className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500"
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6, duration: 0.6 }}
+              >
                 Gaius Loyalty
-              </span>
+              </motion.span>
             </motion.h1>
             
             <motion.p 
               className="text-xl md:text-2xl max-w-3xl mx-auto mb-10 text-blue-100"
               variants={itemVariants}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.6 }}
             >
               The all-in-one blockchain-powered loyalty program that rewards you across multiple brands and services
             </motion.p>
@@ -119,12 +176,15 @@ export function HomePage({ onNavigate }: HomePageProps) {
             <motion.div 
               className="flex flex-col lg:flex-row gap-8 justify-center items-center"
               variants={itemVariants}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1, duration: 0.6 }}
             >
               <motion.div 
                 className="text-center"
                 whileHover={{ scale: 1.02 }}
               >
-                <motion.button 
+                <AnimatedButton
                   onClick={() => {
                     if (!activeAddress) {
                       alert('Please connect your wallet first to create a loyalty program');
@@ -133,24 +193,27 @@ export function HomePage({ onNavigate }: HomePageProps) {
                     onNavigate('create-program');
                   }}
                   className="group px-10 py-5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full font-bold text-xl shadow-xl hover:shadow-2xl transition-all text-gray-900 relative overflow-hidden mb-3"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     🚀 Try For Free
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                </motion.button>
-                <p className="text-sm text-blue-100 opacity-90">
+                </AnimatedButton>
+                <motion.p 
+                  className="text-sm text-blue-100 opacity-90"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.2 }}
+                >
                   {!activeAddress ? 'Connect wallet to get started' : 'Create your first loyalty program'}
-                </p>
+                </motion.p>
               </motion.div>
               
               <motion.div 
                 className="text-center"
                 whileHover={{ scale: 1.02 }}
               >
-                <motion.button 
+                <AnimatedButton
                   onClick={() => {
                     if (!activeAddress) {
                       alert('Please connect your wallet first to access the organization dashboard');
@@ -158,38 +221,46 @@ export function HomePage({ onNavigate }: HomePageProps) {
                     }
                     onNavigate('loyalty-dashboard');
                   }}
+                  variant="outline"
                   className="group px-10 py-5 bg-white/10 backdrop-blur-md border-2 border-white/30 rounded-full font-bold text-xl hover:bg-white/20 hover:border-white/50 transition-all relative overflow-hidden mb-3"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     🏢 Organization Dashboard
                   </span>
                   <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                </motion.button>
-                <p className="text-sm text-blue-100 opacity-90">
+                </AnimatedButton>
+                <motion.p 
+                  className="text-sm text-blue-100 opacity-90"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.4 }}
+                >
                   {!activeAddress ? 'Connect wallet to access dashboard' : 'Manage existing programs'}
-                </p>
+                </motion.p>
               </motion.div>
               
               <motion.div 
                 className="text-center"
                 whileHover={{ scale: 1.02 }}
               >
-                <motion.button 
+                <AnimatedButton
                   onClick={() => onNavigate('pricing')}
+                  variant="outline"
                   className="group px-10 py-5 bg-white/10 backdrop-blur-md border-2 border-white/30 rounded-full font-bold text-xl hover:bg-white/20 hover:border-white/50 transition-all relative overflow-hidden mb-3"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     💰 View Pricing
                   </span>
                   <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                </motion.button>
-                <p className="text-sm text-blue-100 opacity-90">
+                </AnimatedButton>
+                <motion.p 
+                  className="text-sm text-blue-100 opacity-90"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.6 }}
+                >
                   See our subscription plans
-                </p>
+                </motion.p>
               </motion.div>
             </motion.div>
           </motion.div>
@@ -204,11 +275,14 @@ export function HomePage({ onNavigate }: HomePageProps) {
       </div>
 
       {/* Features Section */}
-      <div className="py-20 bg-white dark:bg-[#001324]">
+      <div className="py-20 bg-white dark:bg-[#001324] relative">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div 
             className="text-center mb-16"
             variants={itemVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
           >
             <motion.h2 
               className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 dark:text-white"
@@ -226,29 +300,48 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-2 gap-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
             variants={containerVariants}
           >
             {featureItems.map((feature, index) => (
-              <motion.div
+              <AnimatedCard
                 key={index}
+                delay={index * 0.1}
                 className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-8 border border-gray-100 dark:border-gray-700"
-                variants={cardVariants}
-                whileHover="hover"
               >
-                <div className="text-4xl mb-4">{feature.icon}</div>
+                <motion.div 
+                  className="text-4xl mb-4"
+                  animate={{ 
+                    rotate: [0, 10, -10, 0],
+                    scale: [1, 1.1, 1]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatDelay: 3,
+                    ease: "easeInOut"
+                  }}
+                >
+                  {feature.icon}
+                </motion.div>
                 <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">{feature.title}</h3>
                 <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
-              </motion.div>
+              </AnimatedCard>
             ))}
           </motion.div>
         </div>
       </div>
 
       {/* Loyalty Card Preview */}
-      <div className="py-20 bg-gray-50 dark:bg-gray-800/30">
+      <div className="py-20 bg-gray-50 dark:bg-gray-800/30 relative">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div 
             className="flex flex-col md:flex-row items-center gap-12"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
             variants={containerVariants}
           >
             <motion.div 
@@ -259,66 +352,171 @@ export function HomePage({ onNavigate }: HomePageProps) {
               <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
                 Manage all your loyalty points in one place with our digital wallet and loyalty rewards system.
               </p>
-              <ul className="space-y-4">
+              <AnimatedList className="space-y-4">
                 {['Track points across multiple brands', 'Redeem for exclusive rewards', 'Collect unique loyalty rewards', 'Secure blockchain storage'].map((item, i) => (
                   <motion.li 
                     key={i}
                     className="flex items-center text-gray-700 dark:text-gray-200"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 + (i * 0.1) }}
+                    whileHover={{ x: 10, transition: { duration: 0.2 } }}
                   >
-                    <svg className="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <motion.svg 
+                      className="w-5 h-5 mr-2 text-green-500" 
+                      fill="currentColor" 
+                      viewBox="0 0 20 20"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.5 + (i * 0.1), type: "spring", stiffness: 200 }}
+                    >
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
+                    </motion.svg>
                     {item}
                   </motion.li>
                 ))}
-              </ul>
+              </AnimatedList>
             </motion.div>
             
             <motion.div 
               className="md:w-1/2 mt-10 md:mt-0"
               variants={itemVariants}
-              whileHover={{ scale: 1.05, rotate: 2 }}
-              transition={{ type: "spring", stiffness: 300 }}
+              whileHover={{ 
+                scale: 1.05, 
+                rotate: 2,
+                transition: { type: "spring", stiffness: 300 }
+              }}
             >
               <div className="relative w-full max-w-md mx-auto">
                 {/* Card background with gradient */}
-                <div className="aspect-[1.586/1] rounded-2xl bg-gradient-to-br from-blue-600 to-purple-700 shadow-2xl p-6 relative overflow-hidden">
+                <motion.div 
+                  className="aspect-[1.586/1] rounded-2xl bg-gradient-to-br from-blue-600 to-purple-700 shadow-2xl p-6 relative overflow-hidden"
+                  initial={{ rotateY: -30, opacity: 0 }}
+                  animate={{ rotateY: 0, opacity: 1 }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                >
                   {/* Card decoration elements */}
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-white opacity-10 rounded-full -translate-y-1/2 translate-x-1/4"></div>
-                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-yellow-400 opacity-10 rounded-full translate-y-1/2 -translate-x-1/4"></div>
+                  <motion.div 
+                    className="absolute top-0 right-0 w-40 h-40 bg-white opacity-10 rounded-full -translate-y-1/2 translate-x-1/4"
+                    animate={{ 
+                      scale: [1, 1.2, 1],
+                      opacity: [0.1, 0.2, 0.1]
+                    }}
+                    transition={{ 
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+                  <motion.div 
+                    className="absolute bottom-0 left-0 w-32 h-32 bg-yellow-400 opacity-10 rounded-full translate-y-1/2 -translate-x-1/4"
+                    animate={{ 
+                      scale: [1, 0.8, 1],
+                      opacity: [0.1, 0.15, 0.1]
+                    }}
+                    transition={{ 
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: 1
+                    }}
+                  />
                   
                   {/* Card content */}
                   <div className="relative z-10 h-full flex flex-col justify-between">
                     <div>
                       <div className="flex justify-between items-center">
-                        <h3 className="text-2xl font-bold text-white">Gaius Gold</h3>
-                        <div className="text-xl text-yellow-400">★★★</div>
+                        <motion.h3 
+                          className="text-2xl font-bold text-white"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.5 }}
+                        >
+                          Gaius Gold
+                        </motion.h3>
+                        <motion.div 
+                          className="text-xl text-yellow-400"
+                          initial={{ opacity: 0, scale: 0 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.7, type: "spring", stiffness: 200 }}
+                        >
+                          ★★★
+                        </motion.div>
                       </div>
-                      <p className="text-blue-100 opacity-80 mt-1">Member since 2023</p>
+                      <motion.p 
+                        className="text-blue-100 opacity-80 mt-1"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 0.8 }}
+                        transition={{ delay: 0.6 }}
+                      >
+                        Member since 2023
+                      </motion.p>
                     </div>
                     
                     <div>
                       <div className="mb-2">
-                        <p className="text-xs text-blue-100 opacity-70">MEMBER</p>
-                        <p className="text-lg text-white font-medium truncate">{activeAddress ? activeAddress.substring(0, 8) + '...' + activeAddress.substring(activeAddress.length - 4) : 'Connect Your Wallet'}</p>
+                        <motion.p 
+                          className="text-xs text-blue-100 opacity-70"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 0.7 }}
+                          transition={{ delay: 0.8 }}
+                        >
+                          MEMBER
+                        </motion.p>
+                        <motion.p 
+                          className="text-lg text-white font-medium truncate"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.9 }}
+                        >
+                          {activeAddress ? activeAddress.substring(0, 8) + '...' + activeAddress.substring(activeAddress.length - 4) : 'Connect Your Wallet'}
+                        </motion.p>
                       </div>
                       
                       <div className="flex justify-between items-end">
                         <div>
-                          <p className="text-xs text-blue-100 opacity-70">POINTS BALANCE</p>
-                          <p className="text-2xl font-bold text-white">1,250</p>
+                          <motion.p 
+                            className="text-xs text-blue-100 opacity-70"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 0.7 }}
+                            transition={{ delay: 1 }}
+                          >
+                            POINTS BALANCE
+                          </motion.p>
+                          <motion.p 
+                            className="text-2xl font-bold text-white"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 1.1, type: "spring", stiffness: 200 }}
+                          >
+                            <AnimatedCounter value={1250} />
+                          </motion.p>
                         </div>
-                        <div className="text-white opacity-80 text-4xl">G</div>
+                        <motion.div 
+                          className="text-white opacity-80 text-4xl"
+                          initial={{ opacity: 0, rotate: -180 }}
+                          animate={{ opacity: 0.8, rotate: 0 }}
+                          transition={{ delay: 1.2, duration: 0.8 }}
+                        >
+                          G
+                        </motion.div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
                 
                 {/* Reflection/shine effect */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/0 via-white/30 to-white/0 opacity-20"></div>
+                <motion.div 
+                  className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/0 via-white/30 to-white/0 opacity-20"
+                  animate={{
+                    background: [
+                      "linear-gradient(45deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%)",
+                      "linear-gradient(45deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.3) 80%, rgba(255,255,255,0) 130%)"
+                    ]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
               </div>
             </motion.div>
           </motion.div>
@@ -326,10 +524,13 @@ export function HomePage({ onNavigate }: HomePageProps) {
       </div>
 
       {/* Pricing Section */}
-      <div className="py-20 bg-gray-50 dark:bg-gray-800/30">
+      <div className="py-20 bg-white dark:bg-[#001324] relative">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div 
             className="text-center mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
             variants={itemVariants}
           >
             <motion.h2 
@@ -348,13 +549,15 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
             variants={containerVariants}
           >
             {/* Basic Plan */}
-            <motion.div
+            <AnimatedCard
+              delay={0}
               className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg border border-gray-200 dark:border-gray-700"
-              variants={cardVariants}
-              whileHover="hover"
             >
               <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Basic</h3>
               <div className="mb-4">
@@ -363,36 +566,36 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 <span className="text-sm text-gray-500 dark:text-gray-400">/month</span>
               </div>
               <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <span>Up to 250 members</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <span>5 loyalty programs</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <span>Basic analytics</span>
-                </li>
+                {['Up to 250 members', '5 loyalty programs', 'Basic analytics'].map((feature, i) => (
+                  <motion.li 
+                    key={i}
+                    className="flex items-center gap-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 + i * 0.1 }}
+                  >
+                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>{feature}</span>
+                  </motion.li>
+                ))}
               </ul>
-            </motion.div>
+            </AnimatedCard>
 
             {/* Pro Plan */}
-            <motion.div
-              className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg border-2 border-blue-500 dark:border-blue-500 relative"
-              variants={cardVariants}
-              whileHover="hover"
+            <AnimatedCard
+              delay={0.1}
+              className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg border-2 border-blue-500 dark:border-blue-500 relative transform scale-105"
             >
-              <div className="absolute top-0 left-0 right-0 bg-blue-500 text-white text-center py-1 text-sm font-medium">
+              <motion.div 
+                className="absolute top-0 left-0 right-0 bg-blue-500 text-white text-center py-1 text-sm font-medium"
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
                 Recommended
-              </div>
+              </motion.div>
               <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white mt-4">Professional</h3>
               <div className="mb-4">
                 <span className="text-4xl font-bold">20</span>
@@ -400,38 +603,27 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 <span className="text-sm text-gray-500 dark:text-gray-400">/month</span>
               </div>
               <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <span>Up to 2,500 members</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <span>20 loyalty programs</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <span>Advanced analytics</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <span>Priority support</span>
-                </li>
+                {['Up to 2,500 members', '20 loyalty programs', 'Advanced analytics', 'Priority support'].map((feature, i) => (
+                  <motion.li 
+                    key={i}
+                    className="flex items-center gap-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 + i * 0.1 }}
+                  >
+                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>{feature}</span>
+                  </motion.li>
+                ))}
               </ul>
-            </motion.div>
+            </AnimatedCard>
 
             {/* Enterprise Plan */}
-            <motion.div
+            <AnimatedCard
+              delay={0.2}
               className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg border border-gray-200 dark:border-gray-700"
-              variants={cardVariants}
-              whileHover="hover"
             >
               <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Enterprise</h3>
               <div className="mb-4">
@@ -440,84 +632,102 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 <span className="text-sm text-gray-500 dark:text-gray-400">/month</span>
               </div>
               <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <span>Unlimited members</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <span>Unlimited programs</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <span>Premium analytics</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <span>Dedicated support</span>
-                </li>
+                {['Unlimited members', 'Unlimited programs', 'Premium analytics', 'Dedicated support'].map((feature, i) => (
+                  <motion.li 
+                    key={i}
+                    className="flex items-center gap-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.7 + i * 0.1 }}
+                  >
+                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>{feature}</span>
+                  </motion.li>
+                ))}
               </ul>
-            </motion.div>
+            </AnimatedCard>
           </motion.div>
 
           <motion.div 
             className="text-center mt-12"
-            variants={itemVariants}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5 }}
           >
-            <motion.button 
+            <AnimatedButton 
               onClick={() => onNavigate('pricing')}
               className="px-8 py-4 bg-blue-500 text-white rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
             >
               View All Plans
-            </motion.button>
+            </AnimatedButton>
           </motion.div>
         </div>
       </div>
 
       {/* CTA Section */}
-      <div className="py-20 bg-gradient-to-br from-blue-600 to-purple-700 text-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="py-20 bg-gradient-to-br from-blue-600 to-purple-700 text-white relative overflow-hidden">
+        {/* Background animation */}
+        <motion.div
+          className="absolute inset-0"
+          animate={{
+            background: [
+              "linear-gradient(45deg, #3B82F6, #8B5CF6)",
+              "linear-gradient(45deg, #8B5CF6, #3B82F6)",
+              "linear-gradient(45deg, #3B82F6, #8B5CF6)"
+            ]
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.h2 
             className="text-3xl md:text-4xl font-bold mb-6"
-            variants={itemVariants}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
           >
             Ready to Join Gaius Loyalty?
           </motion.h2>
           
           <motion.p 
             className="text-xl text-blue-100 max-w-3xl mx-auto mb-10"
-            variants={itemVariants}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
             Connect your wallet now to start earning rewards and collecting unique loyalty rewards
           </motion.p>
           
-          <motion.button 
-            onClick={() => {
-              if (!activeAddress) {
-                alert('Please connect your wallet first to create a loyalty program');
-                return;
-              }
-              onNavigate('create-program');
-            }}
-            className="px-8 py-4 bg-white text-blue-600 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            variants={itemVariants}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
           >
-            {!activeAddress ? 'Connect Wallet & Start Earning' : 'Create Loyalty Program'}
-          </motion.button>
+            <AnimatedButton 
+              onClick={() => {
+                if (!activeAddress) {
+                  alert('Please connect your wallet first to create a loyalty program');
+                  return;
+                }
+                onNavigate('create-program');
+              }}
+              className="px-8 py-4 bg-white text-blue-600 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all"
+            >
+              {!activeAddress ? 'Connect Wallet & Start Earning' : 'Create Loyalty Program'}
+            </AnimatedButton>
+          </motion.div>
         </div>
       </div>
     </motion.div>
   );
-} 
+}
