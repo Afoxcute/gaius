@@ -4,6 +4,7 @@ import { formatNumber, formatShortAddress } from '@txnlab/utils-ts';
 import { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabase';
 import { User, LogOut } from 'lucide-react';
+import { fetchAdminInfo, AdminInfo } from '../utils/admin';
 
 interface WalletInfoProps {
   subscriptionPlan?: string | null;
@@ -18,36 +19,25 @@ export function WalletInfo({ subscriptionPlan = null }: WalletInfoProps) {
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [adminInfo, setAdminInfo] = useState<AdminInfo | null>(null);
 
   // Fetch admin info when address changes
   useEffect(() => {
-    const fetchAdminInfo = async () => {
+    const getAdminInfo = async () => {
       if (!activeAddress) return;
       
       try {
-        const { data, error } = await supabase
-          .from('organization_admins')
-          .select('full_name, email')
-          .eq('wallet_address', activeAddress)
-          .single();
-        
-        if (error) {
-          console.log('Not an admin or error fetching admin info:', error);
-          setIsAdmin(false);
-          return;
-        }
-        
-        if (data) {
-          setAdminName(data.full_name);
-          setAdminEmail(data.email);
-          setIsAdmin(true);
-        }
+        const info = await fetchAdminInfo(activeAddress);
+        setAdminInfo(info);
+        setAdminName(info.fullName);
+        setAdminEmail(info.email);
+        setIsAdmin(info.isAdmin);
       } catch (error) {
         console.error('Error fetching admin info:', error);
       }
     };
     
-    fetchAdminInfo();
+    getAdminInfo();
   }, [activeAddress]);
 
   // Handle sign out
@@ -135,9 +125,12 @@ export function WalletInfo({ subscriptionPlan = null }: WalletInfoProps) {
                   }`}>
                     {activeNetwork === 'mainnet' ? 'MainNet' : 'TestNet'}
                   </div>
-                  {subscriptionPlan && (
+                  {(subscriptionPlan || adminInfo?.subscriptionPlan) && (
                     <div className="px-2 py-0.5 bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300 rounded-full text-xs font-medium">
-                      {subscriptionPlan.charAt(0).toUpperCase() + subscriptionPlan.slice(1)} Plan
+                      {(() => {
+                        const plan = subscriptionPlan || adminInfo?.subscriptionPlan || '';
+                        return plan.charAt(0).toUpperCase() + plan.slice(1) + ' Plan';
+                      })()}
                     </div>
                   )}
                 </div>
